@@ -1,22 +1,13 @@
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        {/* Hiển thị thông tin */}
+        <h1>Trường Đại học Sư phạm Kỹ thuật TP. HCM</h1>
+        <h2>Họ và tên: Nguyễn Hồng Sơn</h2>
+        <h3>MSSV: 22110408</h3>
       </header>
     </div>
   );
