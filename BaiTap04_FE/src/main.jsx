@@ -7,6 +7,7 @@ import HomePage from "./pages/home.jsx";
 import UserPage from "./pages/user.jsx";
 import RegisterPage from "./pages/register.jsx";
 import LoginPage from "./pages/login.jsx";
+import ProductPage from "./pages/product.jsx"; 
 import { AuthWrapper } from "./components/context/auth.context.jsx";
 
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
         path: "user",
         element: <UserPage />,
       },
+      {
+        path: "product",          
+        element: <ProductPage />, 
+      },
     ],
   },
   {
@@ -31,7 +36,7 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginPage />,
-  }
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -3,6 +3,7 @@ import {
     UsergroupAddOutlined,
     HomeOutlined,
     SettingOutlined,
+    ShoppingOutlined, // icon cho product
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,15 +13,51 @@ const Header = () => {
     const navigate = useNavigate();
     const { auth, setAuth } = useContext(AuthContext);
 
-    console.log(">>> check auth: ", auth);
-    console.log(">>> check auth.user: ", auth?.user);
-    console.log(">>> check auth.isAuthenticated: ", auth?.isAuthenticated);
+    const [current, setCurrent] = useState("home");
+
+    const displayName = auth?.user?.name || auth?.user?.email || "User";
+
+    const getUserMenu = () => {
+        if (auth.isAuthenticated) {
+            return [
+                {
+                    label: (
+                        <span
+                            onClick={() => {
+                                localStorage.removeItem("access_token");
+                                setCurrent("home");
+                                setAuth({
+                                    isAuthenticated: false,
+                                    user: { email: "", name: "" }
+                                });
+                                navigate("/");
+                            }}
+                        >
+                            Đăng xuất
+                        </span>
+                    ),
+                    key: "logout",
+                },
+            ];
+        }
+        return [
+            {
+                label: <Link to={"/login"}>Đăng nhập</Link>,
+                key: "login",
+            },
+        ];
+    };
 
     const items = [
         {
             label: <Link to={"/"}>Home Page</Link>,
             key: "home",
             icon: <HomeOutlined />,
+        },
+        {
+            label: <Link to={"/product"}>Products</Link>,
+            key: "product",
+            icon: <ShoppingOutlined />,
         },
         ...(auth.isAuthenticated
             ? [
@@ -31,53 +68,18 @@ const Header = () => {
                 },
             ]
             : []),
-
         {
-            label: auth.isAuthenticated
-                ? `Welcome ${auth?.user?.email || auth?.user?.name || "User"}`
-                : "Welcome Guest",
+            label: auth.isAuthenticated ? `Welcome ${displayName}` : "Welcome Guest",
             key: "SubMenu",
             icon: <SettingOutlined />,
-            children: [
-                ...(auth.isAuthenticated
-                    ? [
-                        {
-                            label: (
-                                <span
-                                    onClick={() => {
-                                        localStorage.removeItem("access_token");
-                                        setCurrent("home");
-
-                                        setAuth({
-                                            isAuthenticated: false,
-                                            user: {
-                                                email: "",
-                                                name: "",
-                                            }
-                                        })
-                                        navigate("/");
-                                    }}
-                                >
-                                    Đăng xuất
-                                </span>
-                            ),
-                            key: "logout",
-                        },
-                    ]
-                    : [
-                        {
-                            label: <Link to={"/login"}>Đăng nhập</Link>,
-                            key: "login",
-                        },
-                    ]),
-            ],
+            children: getUserMenu(),
         },
     ];
-    const [current, setCurrent] = useState("mail");
+
     const onClick = (e) => {
-        console.log("click ", e);
         setCurrent(e.key);
     };
+
     return (
         <Menu
             onClick={onClick}
