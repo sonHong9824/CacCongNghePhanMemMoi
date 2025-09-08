@@ -51,6 +51,30 @@ const createProductApi = (name, description, price, stock, images, category) => 
   return axios.post(URL_API, data);
 };
 
+const searchProductApi = ({
+  keyword = "",
+  page = 1,
+  limit = 10,
+  priceMin,
+  priceMax,
+  discountMin,
+  discountMax,
+  categoryId,
+}) => {
+  let URL_API = `/v1/api/product/search?keyword=${encodeURIComponent(
+    keyword
+  )}&page=${page}&limit=${limit}`;
+
+  if (priceMin !== undefined) URL_API += `&priceMin=${priceMin}`;
+  if (priceMax !== undefined) URL_API += `&priceMax=${priceMax}`;
+  if (discountMin !== undefined) URL_API += `&discountMin=${discountMin}`;
+  if (discountMax !== undefined) URL_API += `&discountMax=${discountMax}`;
+  if (categoryId) URL_API += `&categoryId=${categoryId}`;
+
+  return axios.get(URL_API);
+};
+
+
 export {
   createUserApi,
   loginApi,
@@ -59,5 +83,6 @@ export {
   createCategoryApi,
   getProductApi,
   getProductByCategoryApi,
-  createProductApi
+  createProductApi,
+  searchProductApi,
 };

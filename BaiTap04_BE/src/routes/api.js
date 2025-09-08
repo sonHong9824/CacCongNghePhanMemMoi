@@ -1,4 +1,5 @@
 const express = require('express');
+const { esClient } = require('../elasticsearch');
 const {
   createUser,
   handleLogin,
@@ -14,7 +15,8 @@ const {
 const {
   createProduct,
   getProducts,
-  getProductsByCategory
+  getProductsByCategory,
+  searchProducts
 } = require('../controllers/productController');
 
 const routerAPI = express.Router();
@@ -38,5 +40,7 @@ routerAPI.post('/product', auth, createProduct);
 routerAPI.get('/product', getProducts);
 
 routerAPI.get('/category/:categoryId', getProductsByCategory);
+
+routerAPI.get('/product/search', searchProducts);
 
 module.exports = routerAPI;

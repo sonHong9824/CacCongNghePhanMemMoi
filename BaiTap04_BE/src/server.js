@@ -5,6 +5,7 @@ const configViewEngine = require('./config/viewEngine');
 const apiRoutes = require('./routes/api');
 const connection = require('./config/database');
 const {getHomepage} = require('./controllers/homeController');
+const { checkConnection } = require('./elasticsearch');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8080;
@@ -22,6 +23,7 @@ app.use('/v1/api', apiRoutes);
 (async () => {
     try {
         await connection();
+        await checkConnection(); // kiểm tra ES
         app.listen(port, () => {
             console.log(`Server is running on http://localhost:${port}`);
         });
