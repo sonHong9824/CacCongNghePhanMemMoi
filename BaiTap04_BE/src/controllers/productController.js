@@ -22,6 +22,7 @@ const createProduct = async (req, res) => {
         stock: savedProduct.stock,
         images: savedProduct.images,
         category: savedProduct.category.toString(),
+        discount: savedProduct.discount || 0,
         createdAt: savedProduct.createdAt
       }
     });
@@ -84,84 +85,63 @@ const getProductsByCategory = async (req, res) => {
 };
 
 const searchProducts = async (req, res) => {
-  const keyword = req.query.keyword || req.query.q;
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-
-  // Lọc khoảng giá
-  const minPrice = req.query.priceMin !== undefined ? parseFloat(req.query.priceMin) : null;
-  const maxPrice = req.query.priceMax !== undefined ? parseFloat(req.query.priceMax) : null;
-
-  // Lọc khoảng discount
-  const minDiscount = req.query.discountMin !== undefined ? parseFloat(req.query.discountMin) : null;
-  const maxDiscount = req.query.discountMax !== undefined ? parseFloat(req.query.discountMax) : null;
-
-  // Lọc theo danh mục
-  const categoryId = req.query.categoryId || null;
-
-  // Nếu không có từ khóa và filter → báo lỗi
-  if (!keyword && minPrice === null && maxPrice === null && minDiscount === null && maxDiscount === null && !categoryId) {
-    return res.status(400).json({ error: "Missing search query or filters" });
-  }
-
   try {
+    const { q, keyword, categoryId, priceMin, priceMax, discountMin, discountMax } = req.query;
+
+    console.log("👉 Nhận request search với query:", req.query);
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
     const mustQueries = [];
 
-    // Tìm theo keyword
-    if (keyword) {
+    const searchKeyword = keyword || q;
+    if (searchKeyword) {
       mustQueries.push({
         multi_match: {
-          query: keyword,
+          query: searchKeyword,
           fields: ["name^3", "description"],
           fuzziness: "AUTO"
         }
       });
     }
 
-    // Lọc theo khoảng giá
-    if (minPrice !== null || maxPrice !== null) {
-      const range = {};
-      if (minPrice !== null) range.gte = minPrice;
-      if (maxPrice !== null) range.lte = maxPrice;
-
-      mustQueries.push({
-        range: { price: range }
-      });
-    }
-
-    // Lọc theo khoảng discount
-    if (minDiscount !== null || maxDiscount !== null) {
-      const range = {};
-      if (minDiscount !== null) range.gte = minDiscount;
-      if (maxDiscount !== null) range.lte = maxDiscount;
-
-      mustQueries.push({
-        range: { discount: range }
-      });
-    }
-
-    // Lọc theo category
     if (categoryId) {
-      mustQueries.push({
-        term: { category: categoryId } // category trong ES phải là string
-      });
+      mustQueries.push({ term: { category: categoryId } });
+    }
+
+    if (priceMin !== undefined || priceMax !== undefined) {
+      const range = {};
+      if (priceMin !== undefined) range.gte = parseFloat(priceMin);
+      if (priceMax !== undefined) range.lte = parseFloat(priceMax);
+      mustQueries.push({ range: { price: range } });
+    }
+
+    if (discountMin !== undefined || discountMax !== undefined) {
+      const range = {};
+      if (discountMin !== undefined) range.gte = parseFloat(discountMin);
+      if (discountMax !== undefined) range.lte = parseFloat(discountMax);
+      mustQueries.push({ range: { discount: range } });
+    }
+
+    if (mustQueries.length === 0) {
+      console.warn("⚠️ Không có filter nào, return lỗi");
+      return res.status(400).json({ error: "Missing search query or filters" });
     }
 
     const result = await esClient.search({
       index: "products",
       from: (page - 1) * limit,
       size: limit,
-      query: {
-        bool: {
-          must: mustQueries
-        }
-      }
+      query: { bool: { must: mustQueries } }
     });
+
+    console.log("✅ Elasticsearch trả về:", JSON.stringify(result.hits, null, 2));
 
     const products = result.hits.hits.map(hit => ({
       id: hit._id,
       score: hit._score,
-      ...hit._source,
+      ...hit._source
     }));
 
     res.json({
@@ -170,9 +150,10 @@ const searchProducts = async (req, res) => {
       total: result.hits.total.value,
       page,
       totalPages: Math.ceil(result.hits.total.value / limit),
-      products,
+      products
     });
   } catch (err) {
+    console.error("❌ Lỗi searchProducts:", err);
     res.status(500).json({ error: err.message });
   }
 };
