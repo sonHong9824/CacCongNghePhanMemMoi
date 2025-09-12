@@ -1,6 +1,6 @@
 {
   "name": "cart-ui",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Thư viện UI cho chức năng Giỏ hàng (thêm, sửa, xóa, chuẩn hóa component)",
   "author": "Nguyen Hong Son",
   "license": "MIT",
