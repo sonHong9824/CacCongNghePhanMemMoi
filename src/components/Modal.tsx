@@ -6,7 +6,7 @@ export interface ModalProps {
   onClose: () => void;
   title?: string;
   children?: React.ReactNode;
-  actions?: React.ReactNode; // Cho phép truyền nhiều nút tuỳ ý
+  actions?: React.ReactNode;
   showFooter?: boolean;
 }
 
@@ -21,12 +21,12 @@ const Modal: React.FC<ModalProps> = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 animate-fadeIn">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md transform animate-scaleIn">
-        {title && <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>}
-        <div className="mb-4 text-gray-700">{children}</div>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg transform animate-scaleIn">
+        {title && <h2 className="text-2xl font-bold text-gray-800 mb-4">{title}</h2>}
+        <div className="text-gray-600">{children}</div>
         {showFooter && (
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 mt-6">
             {actions}
             <Button variant="secondary" onClick={onClose}>
               Đóng

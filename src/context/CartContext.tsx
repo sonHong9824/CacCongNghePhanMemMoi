@@ -21,16 +21,26 @@ const initial: State = { items: [] };
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "ADD": {
-      const exists = state.items.find(i => i.id === action.item.id);
+      const exists = state.items.find((i) => i.id === action.item.id);
       if (exists) {
-        return { items: state.items.map(i => i.id === action.item.id ? { ...i, qty: i.qty + action.item.qty } : i) };
+        return {
+          items: state.items.map((i) =>
+            i.id === action.item.id
+              ? { ...i, qty: i.qty + action.item.qty }
+              : i
+          ),
+        };
       }
       return { items: [...state.items, action.item] };
     }
     case "UPDATE":
-      return { items: state.items.map(i => i.id === action.id ? { ...i, ...action.patch } : i) };
+      return {
+        items: state.items.map((i) =>
+          i.id === action.id ? { ...i, ...action.patch } : i
+        ),
+      };
     case "REMOVE":
-      return { items: state.items.filter(i => i.id !== action.id) };
+      return { items: state.items.filter((i) => i.id !== action.id) };
     case "CLEAR":
       return { items: [] };
     default:
@@ -48,11 +58,18 @@ const CartContext = createContext<{
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
+
   const add = (item: CartItem) => dispatch({ type: "ADD", item });
-  const update = (id: string, patch: Partial<CartItem>) => dispatch({ type: "UPDATE", id, patch });
+  const update = (id: string, patch: Partial<CartItem>) =>
+    dispatch({ type: "UPDATE", id, patch });
   const remove = (id: string) => dispatch({ type: "REMOVE", id });
   const clear = () => dispatch({ type: "CLEAR" });
-  return <CartContext.Provider value={{ state, add, update, remove, clear }}>{children}</CartContext.Provider>;
+
+  return (
+    <CartContext.Provider value={{ state, add, update, remove, clear }}>
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {
