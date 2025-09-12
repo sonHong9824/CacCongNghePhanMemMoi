@@ -1,15 +1,17 @@
 import React from "react";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "danger";
 }
 
 const Button: React.FC<ButtonProps> = ({ children, variant = "primary", ...props }) => {
   const baseStyle =
-    "px-4 py-2 rounded font-medium focus:outline-none transition-colors";
+    "px-4 py-2 rounded-lg font-medium focus:outline-none transition-all duration-200 active:scale-95 shadow-md";
+
   const styles = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
+    primary: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:opacity-90",
+    secondary: "bg-gray-100 text-gray-800 hover:bg-gray-200",
+    danger: "bg-red-500 text-white hover:bg-red-600",
   };
 
   return (
