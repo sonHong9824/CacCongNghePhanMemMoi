@@ -88,7 +88,7 @@ const searchProducts = async (req, res) => {
   try {
     const { q, keyword, categoryId, priceMin, priceMax, discountMin, discountMax } = req.query;
 
-    console.log("👉 Nhận request search với query:", req.query);
+    console.log("Nhận request search với query:", req.query);
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -101,7 +101,7 @@ const searchProducts = async (req, res) => {
         multi_match: {
           query: searchKeyword,
           fields: ["name^3", "description"],
-          fuzziness: "AUTO"
+          fuzziness: 2
         }
       });
     }
@@ -125,7 +125,7 @@ const searchProducts = async (req, res) => {
     }
 
     if (mustQueries.length === 0) {
-      console.warn("⚠️ Không có filter nào, return lỗi");
+      console.warn("Không có filter nào, return lỗi");
       return res.status(400).json({ error: "Missing search query or filters" });
     }
 
@@ -136,7 +136,7 @@ const searchProducts = async (req, res) => {
       query: { bool: { must: mustQueries } }
     });
 
-    console.log("✅ Elasticsearch trả về:", JSON.stringify(result.hits, null, 2));
+    console.log("Elasticsearch trả về:", JSON.stringify(result.hits, null, 2));
 
     const products = result.hits.hits.map(hit => ({
       id: hit._id,
@@ -153,7 +153,7 @@ const searchProducts = async (req, res) => {
       products
     });
   } catch (err) {
-    console.error("❌ Lỗi searchProducts:", err);
+    console.error("Lỗi searchProducts:", err);
     res.status(500).json({ error: err.message });
   }
 };
